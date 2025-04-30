@@ -1,0 +1,25 @@
+# Virtual Environment
+venv/
+*.pyc
+__pycache__/
+
+# Environment files
+.env
+
+# IDE-specific files
+.vscode/
+.idea/
+
+# Dependency directories
+node_modules/
+
+# Logs
+*.log
+
+# Build and distribution directories
+build/
+dist/
+*.egg-info/
+
+# Miscellaneous
+.DS_Store

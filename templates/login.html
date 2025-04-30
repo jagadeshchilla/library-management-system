@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System - Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        :root {
+            --primary: #8B4513;
+            /* Saddle Brown - rich wood color */
+            --primary-dark: #693109;
+            /* Darker brown */
+            --accent: #D4A373;
+            /* Tan - leather book color */
+            --bg-light: #FAF3E0;
+            /* Light cream */
+            --bg-dark: #F5E6CC;
+            /* Darker cream */
+            --text-dark: #2C1810;
+            /* Deep brown */
+            --text-muted: #6B4423;
+            /* Muted brown */
+            --border-color: #DEC5A7;
+            /* Light tan */
+        }
+
+        .login-page {
+            background: linear-gradient(135deg, var(--bg-light) 0%, var(--bg-dark) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Enhanced Background Animations */
+        .login-page::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%238B4513' fill-opacity='0.03' d='M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,138.7C960,139,1056,117,1152,106.7C1248,96,1344,96,1392,96L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") no-repeat bottom;
+            background-size: cover;
+            animation: wave 20s linear infinite;
+            opacity: 0.7;
+        }
+
+        .login-page::after {
+            background: radial-gradient(circle, transparent 20%, #f6f8fd 20%, #f6f8fd 80%, transparent 80%, transparent),
+                radial-gradient(circle, transparent 20%, #f6f8fd 20%, #f6f8fd 80%, transparent 80%, transparent) 50px 50px;
+            background-size: 100px 100px;
+            animation: backgroundMove 8s linear infinite;
+            opacity: 0.4;
+        }
+
+        @keyframes wave {
+            0% {
+                transform: translateX(0) translateY(0) rotate(0);
+            }
+
+            50% {
+                transform: translateX(-2%) translateY(1%) rotate(1deg);
+            }
+
+            100% {
+                transform: translateX(0) translateY(0) rotate(0);
+            }
+        }
+
+        @keyframes backgroundMove {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 100px 100px;
+            }
+        }
+
+        .floating-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 6s infinite;
+        }
+
+        .particle:nth-child(1) {
+            left: 10%;
+            top: 20%;
+            animation-delay: 0s;
+        }
+
+        .particle:nth-child(2) {
+            left: 80%;
+            top: 60%;
+            animation-delay: 1s;
+        }
+
+        .particle:nth-child(3) {
+            left: 30%;
+            top: 70%;
+            animation-delay: 2s;
+        }
+
+        .particle:nth-child(4) {
+            left: 70%;
+            top: 30%;
+            animation-delay: 3s;
+        }
+
+        .particle:nth-child(5) {
+            left: 50%;
+            top: 40%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.2;
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+                opacity: 0.4;
+            }
+
+            100% {
+                transform: translateY(0) rotate(360deg);
+                opacity: 0.2;
+            }
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(139, 69, 19, 0.1),
+                0 2px 8px rgba(139, 69, 19, 0.05);
+            width: 100%;
+            max-width: 280px;
+            min-height: 400px;
+            margin: auto;
+            border: none;
+            position: relative;
+            z-index: 1;
+            animation: cardFloat 0.6s ease-out;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes cardFloat {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-body {
+            padding: 1.25rem 1.25rem !important;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .logo-container {
+            margin-bottom: 0.75rem;
+            position: relative;
+            width: 45px;
+            height: 45px;
+            margin: 0 auto 1rem;
+            background: linear-gradient(45deg, rgba(139, 69, 19, 0.1), rgba(212, 163, 115, 0.1));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-container::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .logo-container i {
+            font-size: 1.25rem;
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: 0.95rem !important;
+            font-weight: 700 !important;
+            margin-bottom: 0.2rem !important;
+            color: var(--text-dark);
+            text-align: center;
+        }
+
+        p {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem !important;
+            text-align: center;
+        }
+
+        .nav-pills {
+            margin-bottom: 1rem !important;
+            gap: 0.3rem;
+        }
+
+        .nav-pills .nav-link {
+            font-size: 0.7rem;
+            padding: 0.35rem 0.5rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-pills .nav-link.active {
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
+        }
+
+        .form-floating {
+            margin-bottom: 0.75rem !important;
+        }
+
+        .form-floating>.form-control,
+        .form-floating>.form-select {
+            height: 2.5rem !important;
+            font-size: 0.75rem;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.5rem 0.75rem !important;
+            transition: all 0.3s ease;
+            background-color: var(--bg-light);
+        }
+
+        .form-floating>.form-control:focus,
+        .form-floating>.form-select:focus {
+            border-color: var(--primary);
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(139, 69, 19, 0.1);
+        }
+
+        .form-floating>label {
+            padding: 0.5rem 0.75rem !important;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .btn {
+            height: 2.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 10px;
+            margin-top: 0.25rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+            border: none;
+            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(139, 69, 19, 0.3);
+            background: linear-gradient(45deg, var(--primary-dark), var(--primary));
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: translateX(-100%);
+            animation: btnShine 3s infinite;
+        }
+
+        @keyframes btnShine {
+            to {
+                transform: translateX(100%);
+            }
+        }
+
+        .alert {
+            font-size: 0.75rem;
+            padding: 0.625rem 0.875rem;
+            margin-top: 0.875rem;
+            border-radius: 10px;
+            background: rgba(139, 69, 19, 0.1);
+            color: var(--primary-dark);
+            border: 1px solid rgba(139, 69, 19, 0.1);
+        }
+
+        .alert-success {
+            background: rgba(76, 175, 80, 0.1);
+            color: #2e7d32;
+            border-color: rgba(76, 175, 80, 0.2);
+        }
+
+        .alert-danger {
+            background: rgba(211, 47, 47, 0.1);
+            color: #c62828;
+            border-color: rgba(211, 47, 47, 0.2);
+        }
+
+        @media (max-width: 576px) {
+            .login-card {
+                max-width: 260px;
+                min-height: 380px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .login-card {
+                max-width: 240px;
+                min-height: 360px;
+            }
+        }
+    </style>
+</head>
+
+<body class="login-page">
+    <!-- Add floating particles -->
+    <div class="floating-particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <div class="card login-card">
+                    <div class="card-body">
+                        <!-- Logo and Title -->
+                        <div class="text-center">
+                            <div class="logo-container">
+                                <i class="fas fa-book-reader"></i>
+                            </div>
+                            <h2>Library Management System</h2>
+                            <p>Welcome back! Please login to your account.</p>
+                        </div>
+
+                        <!-- Login/Register Tabs -->
+                        <ul class="nav nav-pills nav-justified" id="authTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="login-tab-btn" data-bs-toggle="tab"
+                                    data-bs-target="#login-tab-pane" type="button" role="tab">
+                                    <i class="fas fa-sign-in-alt me-1"></i>Login
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="register-tab-btn" data-bs-toggle="tab"
+                                    data-bs-target="#register-tab-pane" type="button" role="tab">
+                                    <i class="fas fa-user-plus me-1"></i>Register
+                                </button>
+                            </li>
+                        </ul>
+
+                        <!-- Tab Content -->
+                        <div class="tab-content" id="authTabsContent">
+                            <!-- Login Form -->
+                            <div class="tab-pane fade show active" id="login-tab-pane" role="tabpanel">
+                                <form id="loginForm" class="needs-validation" novalidate>
+                                    <div class="form-floating">
+                                        <input type="email" class="form-control" id="email" name="email"
+                                            placeholder="name@example.com" required>
+                                        <label for="email">Email address</label>
+                                    </div>
+                                    <div class="form-floating">
+                                        <input type="password" class="form-control" id="password" name="password"
+                                            placeholder="Password" required>
+                                        <label for="password">Password</label>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-sign-in-alt me-1"></i>Login
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- Register Form -->
+                            <div class="tab-pane fade" id="register-tab-pane" role="tabpanel">
+                                <form id="registerForm" class="needs-validation" novalidate>
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="registerName" name="name"
+                                            placeholder="Full Name" required>
+                                        <label for="registerName">Full Name</label>
+                                    </div>
+                                    <div class="form-floating">
+                                        <input type="email" class="form-control" id="registerEmail" name="email"
+                                            placeholder="name@example.com" required>
+                                        <label for="registerEmail">Email address</label>
+                                    </div>
+                                    <div class="form-floating">
+                                        <input type="password" class="form-control" id="registerPassword"
+                                            name="password" placeholder="Password" required>
+                                        <label for="registerPassword">Password</label>
+                                    </div>
+                                    <div class="form-floating">
+                                        <select class="form-select" id="registerRole" name="role" required>
+                                            <option value="" selected disabled>Select a role</option>
+                                            <option value="student">Student</option>
+                                            <option value="admin">Admin</option>
+                                        </select>
+                                        <label for="registerRole">Role</label>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-user-plus me-1"></i>Register
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Alert for messages -->
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                        {% endif %}
+                        {% endwith %}
+                        <div id="messageAlert" class="alert d-none mt-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>

@@ -1,0 +1,895 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Dashboard - Library Management System{% endblock %}
+
+{% block additional_css %}
+<style>
+    :root {
+        --primary: #8B4513;
+        --primary-dark: #693109;
+        --accent: #D4A373;
+        --bg-light: #FAF3E0;
+        --bg-dark: #F5E6CC;
+        --text-dark: #2C1810;
+        --text-muted: #6B4423;
+        --border-color: #DEC5A7;
+    }
+
+    body {
+        background-color: var(--bg-light);
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 220px;
+        background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+        padding-top: 15px;
+        color: white;
+        z-index: 100;
+        transition: all 0.3s ease;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-header {
+        padding: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        text-align: center;
+        margin-bottom: 15px;
+    }
+
+    .sidebar-header h3 {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: rgba(255, 255, 255, 0.95);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .profile-section {
+        position: relative;
+        padding: 15px;
+        text-align: center;
+        background: rgba(139, 69, 19, 0.2);
+        border-radius: 12px;
+        margin: 0 10px 15px;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+
+    .profile-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg,
+                transparent,
+                rgba(255, 255, 255, 0.1),
+                transparent);
+        animation: shine 8s infinite;
+    }
+
+    @keyframes shine {
+        0% {
+            left: -100%;
+        }
+
+        20% {
+            left: 100%;
+        }
+
+        100% {
+            left: 100%;
+        }
+    }
+
+    .profile-section:hover {
+        background: rgba(139, 69, 19, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .profile-icon {
+        position: relative;
+        display: inline-block;
+        width: 70px;
+        height: 70px;
+        margin-bottom: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        padding: 5px;
+        animation: floatAnimation 3s ease-in-out infinite;
+    }
+
+    @keyframes floatAnimation {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-5px);
+        }
+    }
+
+    .profile-icon::after {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, var(--accent), transparent);
+        z-index: -1;
+        opacity: 0.5;
+        animation: rotateGradient 4s linear infinite;
+    }
+
+    @keyframes rotateGradient {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .profile-icon i {
+        font-size: 2rem;
+        color: rgba(255, 255, 255, 0.9);
+        line-height: 60px;
+        transition: all 0.3s ease;
+    }
+
+    .profile-section:hover .profile-icon i {
+        transform: scale(1.1);
+        color: var(--accent);
+    }
+
+    .profile-name {
+        font-size: 1.2rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.95);
+        margin: 0;
+        text-transform: lowercase;
+        position: relative;
+        display: inline-block;
+    }
+
+    .profile-name::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -2px;
+        width: 0;
+        height: 1px;
+        background: var(--accent);
+        transition: width 0.3s ease;
+    }
+
+    .profile-section:hover .profile-name::after {
+        width: 100%;
+    }
+
+    .profile-email {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 200px;
+        margin: 0 auto;
+        transition: all 0.3s ease;
+    }
+
+    .profile-section:hover .profile-email {
+        color: var(--accent);
+    }
+
+    .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .sidebar-menu li {
+        margin: 2px 0;
+    }
+
+    .sidebar-menu a {
+        display: flex;
+        align-items: center;
+        padding: 10px 15px;
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border-left: 3px solid transparent;
+        font-size: 0.9rem;
+    }
+
+    .sidebar-menu a:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border-left-color: var(--accent);
+        padding-left: 20px;
+    }
+
+    .sidebar-menu a.active {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+        border-left-color: var(--accent);
+        font-weight: 500;
+    }
+
+    .sidebar-menu i {
+        margin-right: 10px;
+        font-size: 1rem;
+        width: 20px;
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+
+    .sidebar-menu a:hover i {
+        transform: translateX(2px);
+    }
+
+    #logoutBtn {
+        margin-top: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    #logoutBtn:hover {
+        color: #ff6b6b;
+        background: rgba(255, 99, 99, 0.1);
+    }
+
+    .main-content {
+        margin-left: 220px;
+        padding: 15px;
+    }
+
+    .dashboard-card {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(139, 69, 19, 0.1);
+        padding: 15px;
+        margin-bottom: 15px;
+        transition: transform 0.3s;
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-3px);
+    }
+
+    .card-icon {
+        color: var(--primary) !important;
+    }
+
+    .card-icon.text-success {
+        color: #2e7d32 !important;
+    }
+
+    .card-icon.text-danger {
+        color: #c62828 !important;
+    }
+
+    .card-title {
+        font-size: 0.9rem;
+        color: var(--text-dark);
+    }
+
+    .card-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--primary);
+    }
+
+    .book-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 0;
+        height: 100%;
+        max-width: 280px;
+        margin: 0 auto 20px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .book-card img {
+        width: 100%;
+        height: auto;
+        border-radius: 8px 8px 0 0;
+        object-fit: cover;
+    }
+
+    .book-card .card-body {
+        padding: 15px;
+    }
+
+    .book-card .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 8px;
+        line-height: 1.4;
+    }
+
+    .book-card .card-text {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 4px;
+        line-height: 1.4;
+    }
+
+    .book-card .btn-group {
+        padding: 15px;
+        margin-top: auto;
+        display: flex;
+        gap: 8px;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-view-details {
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+
+    .btn-view-details:hover {
+        background-color: var(--primary-dark);
+        color: white;
+    }
+
+    .btn-borrow {
+        background-color: #2e7d32;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+
+    .btn-borrow:hover {
+        background-color: #1b5e20;
+    }
+
+    .books-slider-container {
+        overflow-x: hidden;
+        position: relative;
+        padding: 0 20px;
+        margin: 0 -10px;
+    }
+
+    .slider-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 10;
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        color: var(--text-dark);
+    }
+
+    .slider-nav:hover {
+        background: var(--bg-light);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .prev-btn {
+        left: 0px;
+    }
+
+    .next-btn {
+        right: 0px;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 20px;
+    }
+
+    .search-container {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    .search-container input {
+        background-color: #f8f9fa;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        padding: 12px 16px;
+        font-size: 1rem;
+        width: 100%;
+    }
+
+    .search-container .btn-primary {
+        padding: 12px 24px;
+        font-size: 1rem;
+        background: var(--primary);
+        border: none;
+        border-radius: 4px;
+        width: 100%;
+    }
+
+    .table {
+        width: 100%;
+        margin-bottom: 0;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .table thead {
+        background-color: #4355b9;
+        color: white;
+    }
+
+    .table th {
+        padding: 12px 16px;
+        font-weight: 500;
+        border: none;
+        white-space: nowrap;
+    }
+
+    .table td {
+        padding: 12px 16px;
+        vertical-align: middle;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        background-color: #ffd700;
+        color: #856404;
+    }
+
+    .btn-return {
+        background-color: #2e7d32;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 6px 16px;
+        font-size: 0.9rem;
+    }
+
+    .borrowing-history {
+        margin-top: 30px;
+    }
+
+    .borrowing-history .table thead {
+        background-color: #4355b9;
+    }
+
+    .no-history {
+        text-align: center;
+        padding: 20px;
+        color: #666;
+        font-style: italic;
+    }
+
+    .dashboard-card.table-container {
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .tab-content {
+        padding: 20px 0;
+    }
+
+    .modal img {
+        max-height: 400px;
+        width: auto;
+        margin: 0 auto;
+        display: block;
+    }
+
+    .btn-primary {
+        background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(45deg, var(--primary-dark), var(--primary));
+    }
+
+    @media (max-width: 768px) {
+        .sidebar {
+            width: 180px;
+        }
+
+        .sidebar-header h3 {
+            font-size: 1.1rem;
+        }
+
+        .profile-section {
+            padding: 12px;
+            margin: 0 8px 12px;
+        }
+
+        .profile-icon {
+            width: 60px;
+            height: 60px;
+        }
+
+        .profile-icon i {
+            font-size: 1.8rem;
+            line-height: 50px;
+        }
+
+        .profile-name {
+            font-size: 1.1rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .sidebar {
+            width: 100%;
+            height: auto;
+            position: relative;
+            padding-top: 10px;
+        }
+
+        .sidebar-header {
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 5px;
+            padding: 0 10px;
+        }
+
+        .sidebar-menu li {
+            flex: 1 1 auto;
+            min-width: 120px;
+            margin: 0;
+        }
+
+        .sidebar-menu a {
+            text-align: center;
+            padding: 8px;
+            justify-content: center;
+            border-left: none;
+            border-bottom: 2px solid transparent;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            border-left: none;
+            border-bottom-color: var(--accent);
+            padding-left: 8px;
+        }
+
+        .sidebar-menu i {
+            margin-right: 5px;
+        }
+
+        #logoutBtn {
+            margin-top: 5px;
+            border-top: none;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 10px;
+            text-align: left;
+        }
+
+        .profile-section::before {
+            animation: none;
+        }
+
+        .profile-icon {
+            width: 50px;
+            height: 50px;
+            margin: 0 10px 0 0;
+            animation: none;
+        }
+
+        .profile-icon i {
+            font-size: 1.5rem;
+            line-height: 40px;
+        }
+
+        .profile-name {
+            font-size: 1rem;
+        }
+
+        .profile-name::after {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h3>LIBRARY SYSTEM</h3>
+        <div class="profile-section">
+            <div class="profile-icon">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <h5 class="profile-name" id="studentName">akshay</h5>
+        </div>
+    </div>
+    <ul class="sidebar-menu">
+        <li>
+            <a href="#dashboard-tab" class="nav-link active" data-bs-toggle="tab">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+        </li>
+        <li>
+            <a href="#borrowed-tab" class="nav-link" data-bs-toggle="tab">
+                <i class="fas fa-book"></i> My Borrowed Books
+            </a>
+        </li>
+        <li>
+            <a href="#search-tab" class="nav-link" data-bs-toggle="tab">
+                <i class="fas fa-search"></i> Search Books
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0)" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </li>
+    </ul>
+</div>
+
+<div class="main-content">
+    <div class="tab-content">
+        <!-- Dashboard Tab -->
+        <div class="tab-pane fade show active" id="dashboard-tab">
+            <h2 class="section-title">Welcome, <span id="studentName">Student</span>!</h2>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="dashboard-card text-center">
+                        <div class="card-icon text-primary">
+                            <i class="fas fa-book-open fa-3x mb-3"></i>
+                        </div>
+                        <div class="card-title">Currently Borrowed</div>
+                        <div class="card-value" id="currentlyBorrowed">0</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="dashboard-card text-center">
+                        <div class="card-icon text-success">
+                            <i class="fas fa-history fa-3x mb-3"></i>
+                        </div>
+                        <div class="card-title">Total Borrowed</div>
+                        <div class="card-value" id="totalBorrowed">0</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="dashboard-card text-center">
+                        <div class="card-icon text-danger">
+                            <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
+                        </div>
+                        <div class="card-title">Overdue Books</div>
+                        <div class="card-value" id="overdueBooks">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recently Added Books Section -->
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="dashboard-card">
+                        <h5 class="card-title">Recently Added Books</h5>
+                        <div class="row" id="recentlyAddedBooks">
+                            <!-- Will be populated with JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Popular Books Section -->
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="dashboard-card">
+                        <h5 class="card-title">Popular Books</h5>
+                        <div class="position-relative">
+                            <button class="btn btn-light slider-nav prev-btn" onclick="slideBooks('prev')">&lt;</button>
+                            <button class="btn btn-light slider-nav next-btn" onclick="slideBooks('next')">&gt;</button>
+                            <div class="books-slider-container">
+                                <div class="row flex-nowrap" id="popularBooks">
+                                    <!-- Will be populated with JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommended Books Section -->
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="dashboard-card">
+                        <h5 class="card-title">Recommended Books</h5>
+                        <div id="personalizedRecommendations">
+                            <!-- Will be populated with JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Books Tab -->
+        <div class="tab-pane fade" id="search-tab">
+            <h2 class="section-title">Search Books</h2>
+
+            <div class="search-container mb-4">
+                <div class="row">
+                    <div class="col-md-8">
+                        <input type="text" id="bookSearchInput" class="form-control"
+                            placeholder="Search by title, author, or ISBN...">
+                    </div>
+                    <div class="col-md-4">
+                        <button id="searchBookBtn" class="btn btn-primary w-100">Search</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Results -->
+            <div class="row" id="searchResults">
+                <!-- Will be populated with JavaScript -->
+            </div>
+
+            <!-- Pagination -->
+            <div id="searchPagination" class="d-flex justify-content-center mt-4">
+                <!-- Will be populated with JavaScript -->
+            </div>
+        </div>
+
+        <!-- My Books Tab -->
+        <div class="tab-pane fade" id="borrowed-tab">
+            <h2 class="section-title">My Borrowed Books</h2>
+
+            <div class="table-container">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Book Title</th>
+                            <th>Author</th>
+                            <th>Borrow Date</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="borrowedBooksTableBody">
+                        <!-- Will be populated with JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="dashboard-card mt-4">
+                <h5 class="card-title">Borrowing History</h5>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Book Title</th>
+                            <th>Author</th>
+                            <th>Borrow Date</th>
+                            <th>Return Date</th>
+                            <th>Fine (if any)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="borrowHistoryTableBody">
+                        <!-- Will be populated with JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Profile Tab -->
+        <div class="tab-pane fade" id="profile-tab">
+            <h2 class="section-title">My Profile</h2>
+
+            <div class="dashboard-card">
+                <h5 class="card-title">Account Information</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Name:</strong> <span id="studentName"></span></p>
+                        <p><strong>Email:</strong> <span id="studentEmail"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Book Details Modal -->
+<div class="modal fade" id="bookDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookDetailsTitle">Book Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <img id="bookDetailsImage" src="" alt="Book Cover" class="img-fluid mb-3"
+                            style="max-height: 300px;">
+                    </div>
+                    <div class="col-md-8">
+                        <h4 id="bookDetailsName"></h4>
+                        <p><strong>Author:</strong> <span id="bookDetailsAuthor"></span></p>
+                        <p><strong>Publisher:</strong> <span id="bookDetailsPublisher"></span></p>
+                        <p><strong>Year:</strong> <span id="bookDetailsYear"></span></p>
+                        <p><strong>ISBN:</strong> <span id="bookDetailsISBN"></span></p>
+                        <div id="bookDetailsSimilar">
+                            <h5 class="mt-4">Similar Books</h5>
+                            <div class="row" id="similarBooksContainer">
+                                <!-- Will be populated with JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="borrowBookBtn">Borrow Book</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block additional_js %}
+<script src="{{ url_for('static', filename='js/student.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get student info from localStorage
+        const studentInfo = JSON.parse(localStorage.getItem('studentInfo'));
+        if (studentInfo) {
+            document.getElementById('studentName').textContent = studentInfo.name;
+            document.getElementById('studentEmail').textContent = studentInfo.email;
+        }
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', function () {
+            localStorage.removeItem('studentInfo');
+            window.location.href = '/login';
+        });
+    });
+</script>
+{% endblock %}

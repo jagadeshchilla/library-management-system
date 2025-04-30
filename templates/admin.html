@@ -1,0 +1,922 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - Library Management System{% endblock %}
+
+{% block additional_css %}
+<style>
+    :root {
+        --primary-color: #2c3e50;
+        --secondary-color: #34495e;
+        --accent-color: #3498db;
+        --success-color: #2ecc71;
+        --warning-color: #f1c40f;
+        --danger-color: #e74c3c;
+        --light-bg: #f5f7fa;
+        --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --transition-speed: 0.3s;
+    }
+
+    body {
+        background-color: var(--light-bg);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 260px;
+        background: linear-gradient(165deg, #1a237e 0%, #303f9f 100%);
+        padding-top: 20px;
+        color: white;
+        z-index: 1000;
+        box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .sidebar-header {
+        padding: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .profile-section {
+        padding: 1.5rem;
+        text-align: center;
+        position: relative;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        margin: 0 15px 20px;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-section:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .profile-image {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 3px;
+        margin-bottom: 12px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 12px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .profile-image i {
+        font-size: 2rem;
+        color: rgba(255, 255, 255, 0.9);
+        transition: all 0.3s ease;
+    }
+
+    .profile-image:hover {
+        transform: scale(1.05);
+        border-color: rgba(255, 255, 255, 0.4);
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    .profile-image:hover i {
+        transform: scale(1.1);
+        color: rgba(255, 255, 255, 1);
+    }
+
+    .profile-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: white;
+        margin: 0;
+        letter-spacing: 0.5px;
+        text-transform: capitalize;
+        transition: all 0.3s ease;
+    }
+
+    .profile-name:hover {
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
+
+    .profile-email {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 0;
+    }
+
+    .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .sidebar-menu li {
+        margin: 5px 15px;
+    }
+
+    .sidebar-menu a {
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .sidebar-menu a:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.1) 50%,
+                rgba(255, 255, 255, 0) 100%);
+        transition: left 0.5s ease;
+    }
+
+    .sidebar-menu a:hover:before {
+        left: 100%;
+    }
+
+    .sidebar-menu a:hover,
+    .sidebar-menu a.active {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        transform: translateX(5px);
+    }
+
+    .sidebar-menu i {
+        width: 24px;
+        margin-right: 10px;
+        text-align: center;
+        font-size: 1.1rem;
+        transition: transform 0.3s ease;
+    }
+
+    .sidebar-menu a:hover i {
+        transform: scale(1.1);
+    }
+
+    .sidebar-menu .nav-text {
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
+
+    #logoutBtn {
+        margin-top: auto;
+        color: #ff5252;
+    }
+
+    #logoutBtn:hover {
+        background: rgba(255, 82, 82, 0.1);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 992px) {
+        .sidebar {
+            width: 230px;
+            transform: translateX(-100%);
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .main-content {
+            margin-left: 0;
+        }
+
+        .toggle-sidebar {
+            display: block;
+        }
+
+        .profile-section {
+            padding: 1.2rem;
+            margin: 0 10px 15px;
+        }
+
+        .profile-image {
+            width: 60px;
+            height: 60px;
+        }
+
+        .profile-image i {
+            font-size: 1.75rem;
+        }
+
+        .profile-name {
+            font-size: 1rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .sidebar {
+            width: 100%;
+        }
+
+        .profile-section {
+            padding: 1rem;
+            margin: 0 8px 12px;
+            display: flex;
+            align-items: center;
+            text-align: left;
+            gap: 12px;
+        }
+
+        .profile-image {
+            margin: 0;
+            width: 50px;
+            height: 50px;
+        }
+
+        .profile-image i {
+            font-size: 1.5rem;
+        }
+    }
+
+    /* Toggle Button */
+    .toggle-sidebar {
+        display: none;
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1001;
+        background: #1a237e;
+        border: none;
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .toggle-sidebar:hover {
+        background: #303f9f;
+    }
+
+    .main-content {
+        margin-left: 250px;
+        padding: 30px;
+        transition: all var(--transition-speed);
+    }
+
+    .dashboard-card {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        padding: 25px;
+        margin-bottom: 25px;
+        transition: all var(--transition-speed);
+        border: none;
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .dashboard-card .card-icon {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        transition: all var(--transition-speed);
+    }
+
+    .dashboard-card:hover .card-icon {
+        transform: scale(1.1);
+    }
+
+    .dashboard-card .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: var(--primary-color);
+    }
+
+    .dashboard-card .card-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--accent-color);
+    }
+
+    .chart-container {
+        height: 350px;
+        padding: 15px;
+    }
+
+    .table-container {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        padding: 25px;
+        margin-bottom: 25px;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin-bottom: 25px;
+        color: var(--primary-color);
+        position: relative;
+        padding-bottom: 10px;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background-color: var(--accent-color);
+        border-radius: 3px;
+    }
+
+    .form-container {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        padding: 25px;
+        margin-bottom: 25px;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        padding: 10px 15px;
+        transition: all var(--transition-speed);
+    }
+
+    .form-control:focus {
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+
+    .btn {
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: 500;
+        transition: all var(--transition-speed);
+    }
+
+    .btn-primary {
+        background-color: var(--accent-color);
+        border-color: var(--accent-color);
+    }
+
+    .btn-primary:hover {
+        background-color: #2980b9;
+        border-color: #2980b9;
+        transform: translateY(-2px);
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+
+    .badge {
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-weight: 500;
+    }
+
+    .modal-content {
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+    }
+
+    .modal-header {
+        border-bottom: 1px solid #eee;
+        padding: 20px 25px;
+    }
+
+    .modal-body {
+        padding: 25px;
+    }
+
+    .modal-footer {
+        border-top: 1px solid #eee;
+        padding: 20px 25px;
+    }
+
+    /* Recent Activities Table Styles */
+    .table th {
+        font-weight: 600;
+        color: #2c3e50;
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .table td {
+        vertical-align: middle;
+        padding: 0.75rem 1rem;
+    }
+
+    /* Pagination Styles */
+    .pagination {
+        gap: 5px;
+    }
+
+    .pagination .page-item .page-link {
+        border-radius: 4px;
+        padding: 0.5rem 0.75rem;
+        color: #2c3e50;
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        min-width: 32px;
+        text-align: center;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #3498db;
+        border-color: #3498db;
+        color: #fff;
+    }
+
+    .pagination .page-item.disabled .page-link {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+        color: #6c757d;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #e9ecef;
+        border-color: #dee2e6;
+        color: #2c3e50;
+    }
+
+    .pagination .page-item.active .page-link:hover {
+        background-color: #2980b9;
+        border-color: #2980b9;
+        color: #fff;
+    }
+
+    /* Table Row Hover Effect */
+    .table-hover tbody tr:hover {
+        background-color: rgba(52, 152, 219, 0.05);
+    }
+
+    /* Responsive Table */
+    @media (max-width: 768px) {
+
+        .table th,
+        .table td {
+            padding: 0.5rem;
+        }
+
+        .pagination .page-link {
+            padding: 0.4rem 0.6rem;
+            min-width: 28px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h3 class="mb-0">Library System</h3>
+    </div>
+
+    <div class="profile-section">
+        <div class="profile-image">
+            <i class="fas fa-user-circle"></i>
+        </div>
+        <h5 class="profile-name" id="adminName">Admin</h5>
+    </div>
+
+    <ul class="sidebar-menu">
+        <li>
+            <a href="#dashboard-tab" class="nav-link active" data-bs-toggle="tab">
+                <i class="fas fa-tachometer-alt"></i>
+                <span class="nav-text">Dashboard</span>
+            </a>
+        </li>
+        <li>
+            <a href="#books-tab" class="nav-link" data-bs-toggle="tab">
+                <i class="fas fa-book"></i>
+                <span class="nav-text">Manage Books</span>
+            </a>
+        </li>
+        <li>
+            <a href="#students-tab" class="nav-link" data-bs-toggle="tab">
+                <i class="fas fa-users"></i>
+                <span class="nav-text">Manage Students</span>
+            </a>
+        </li>
+        <li>
+            <a href="#borrowed-tab" class="nav-link" data-bs-toggle="tab">
+                <i class="fas fa-exchange-alt"></i>
+                <span class="nav-text">Borrowed Books</span>
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0)" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="nav-text">Logout</span>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<button class="toggle-sidebar d-lg-none">
+    <i class="fas fa-bars"></i>
+</button>
+
+<div class="main-content">
+    <div class="tab-content">
+        <!-- Dashboard Tab -->
+        <div class="tab-pane fade show active" id="dashboard-tab">
+            <h2 class="section-title">Dashboard Overview</h2>
+
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="dashboard-card text-center">
+                        <div class="card-icon text-primary">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="card-title">Total Books</div>
+                        <div class="card-value" id="totalBooks">Loading...</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="dashboard-card text-center">
+                        <div class="card-icon text-success">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div class="card-title">Total Students</div>
+                        <div class="card-value" id="totalStudents">Loading...</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="dashboard-card text-center">
+                        <div class="card-icon text-warning">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <div class="card-title">Books Borrowed</div>
+                        <div class="card-value" id="totalBorrowed">Loading...</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="dashboard-card text-center">
+                        <div class="card-icon text-danger">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="card-title">Overdue Books</div>
+                        <div class="card-value" id="overdueBooks">Loading...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="dashboard-card">
+                        <h5 class="card-title">Monthly Borrowing Trends</h5>
+                        <div class="chart-container">
+                            <canvas id="borrowingTrendsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="dashboard-card">
+                        <h5 class="card-title">Popular Book Categories</h5>
+                        <div class="chart-container">
+                            <canvas id="bookCategoriesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activities Section -->
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="dashboard-card">
+                        <h5 class="card-title mb-3">Recent Activities</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="px-4 py-3" style="width: 20%">Date</th>
+                                        <th scope="col" class="px-4 py-3" style="width: 25%">Student</th>
+                                        <th scope="col" class="px-4 py-3" style="width: 40%">Book</th>
+                                        <th scope="col" class="px-4 py-3" style="width: 15%">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentActivities">
+                                    <!-- Activities will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="p-3 border-top">
+                            <nav aria-label="Recent activities pagination">
+                                <ul class="pagination pagination-sm flex-wrap justify-content-center mb-0"
+                                    id="activitiesPagination">
+                                    <!-- Pagination will be loaded here -->
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Books Tab -->
+        <div class="tab-pane fade" id="books-tab">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="section-title">Book Management</h2>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBookModal">
+                    <i class="fas fa-plus"></i> Add New Book
+                </button>
+            </div>
+
+            <div class="form-container mb-4">
+                <div class="row">
+                    <div class="col-md-8">
+                        <input type="text" id="bookSearchInput" class="form-control"
+                            placeholder="Search books by title, author, or ISBN...">
+                    </div>
+                    <div class="col-md-4">
+                        <button id="searchBookBtn" class="btn btn-primary w-100">Search</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Books Table -->
+            <div class="dashboard-card">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th style="width: 15%">ISBN</th>
+                                <th style="width: 25%">Title</th>
+                                <th style="width: 20%">Author</th>
+                                <th style="width: 15%">Publisher</th>
+                                <th style="width: 10%">Year</th>
+                                <th style="width: 5%">Cover</th>
+                                <th style="width: 10%">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="booksTableBody">
+                            <!-- Books will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="booksPagination" class="d-flex justify-content-center mt-4">
+                    <!-- Pagination will be added with JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Students Tab -->
+        <div class="tab-pane fade" id="students-tab">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="section-title">Student Management</h2>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStudentModal">
+                    <i class="fas fa-plus"></i> Add New Student
+                </button>
+            </div>
+
+            <div class="form-container mb-4">
+                <div class="row">
+                    <div class="col-md-8">
+                        <input type="text" id="studentSearchInput" class="form-control"
+                            placeholder="Search students by name or email...">
+                    </div>
+                    <div class="col-md-4">
+                        <button id="searchStudentBtn" class="btn btn-primary w-100">Search</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Joined Date</th>
+                            <th>Books Borrowed</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody">
+                        <!-- Will be populated with JavaScript -->
+                    </tbody>
+                </table>
+                <div id="studentsPagination" class="d-flex justify-content-center mt-4">
+                    <!-- Pagination will be added with JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Borrowed Books Tab -->
+        <div class="tab-pane fade" id="borrowed-tab">
+            <h2 class="section-title">Borrowed Books</h2>
+
+            <div class="form-container mb-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        <select id="borrowFilterStatus" class="form-select">
+                            <option value="all">All</option>
+                            <option value="borrowed">Currently Borrowed</option>
+                            <option value="returned">Returned</option>
+                            <option value="overdue">Overdue</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" id="borrowSearchInput" class="form-control"
+                            placeholder="Search by student name or book title...">
+                    </div>
+                    <div class="col-md-2">
+                        <button id="searchBorrowBtn" class="btn btn-primary w-100">Filter</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Student</th>
+                            <th>Book</th>
+                            <th>Borrow Date</th>
+                            <th>Due Date</th>
+                            <th>Return Date</th>
+                            <th>Fine</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="borrowedBooksTableBody">
+                        <!-- Will be populated with JavaScript -->
+                    </tbody>
+                </table>
+                <div id="borrowedPagination" class="d-flex justify-content-center mt-4">
+                    <!-- Pagination will be added with JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Tab -->
+        <div class="tab-pane fade" id="reports-tab">
+            <h2 class="section-title">Reports & Analytics</h2>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="dashboard-card">
+                        <h5 class="card-title">Most Popular Books</h5>
+                        <div class="chart-container">
+                            <canvas id="popularBooksChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="dashboard-card">
+                        <h5 class="card-title">Student Activity</h5>
+                        <div class="chart-container">
+                            <canvas id="studentActivityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="dashboard-card">
+                        <h5 class="card-title">Fine Collection Report</h5>
+                        <div class="chart-container">
+                            <canvas id="fineCollectionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Book Modal -->
+<div class="modal fade" id="addBookModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Book</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addBookForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="isbn" class="form-label">ISBN</label>
+                            <input type="text" class="form-control" id="isbn" name="isbn" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" name="title" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="author" class="form-label">Author</label>
+                            <input type="text" class="form-control" id="author" name="author" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="year" class="form-label">Year of Publication</label>
+                            <input type="number" class="form-control" id="year" name="year" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="publisher" class="form-label">Publisher</label>
+                        <input type="text" class="form-control" id="publisher" name="publisher" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="imageUrlS" class="form-label">Small Image URL</label>
+                            <input type="url" class="form-control" id="imageUrlS" name="imageUrlS">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="imageUrlM" class="form-label">Medium Image URL</label>
+                            <input type="url" class="form-control" id="imageUrlM" name="imageUrlM">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="imageUrlL" class="form-label">Large Image URL</label>
+                            <input type="url" class="form-control" id="imageUrlL" name="imageUrlL">
+                        </div>
+                    </div>
+                    <div class="alert alert-info">
+                        <small>
+                            <i class="fas fa-info-circle"></i> Image URLs should be direct links to images (less than
+                            250 characters).
+                            Do not paste base64 image data, as it will be too large for storage.
+                        </small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveBookBtn">Save Book</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Student Modal -->
+<div class="modal fade" id="addStudentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Student</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addStudentForm">
+                    <div class="mb-3">
+                        <label for="studentName" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="studentName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="studentEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="studentEmail" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="studentPassword" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="studentPassword" name="password" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveStudentBtn">Save Student</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block additional_js %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,170 @@
+import mysql.connector
+from mysql.connector import Error
+import pandas as pd
+import numpy as np
+
+def setup_database():
+    try:
+        connection = mysql.connector.connect(
+            host="127.0.0.1",
+            port=3306,
+            user="root",
+            password="123456789"
+        )
+        
+        if connection.is_connected():
+            cursor = connection.cursor()
+            
+            # Create database
+            cursor.execute("DROP DATABASE IF EXISTS book_recommendation")
+            cursor.execute("CREATE DATABASE book_recommendation")
+            cursor.execute("USE book_recommendation")
+            
+            # Create books table with modified VARCHAR lengths
+            cursor.execute("""
+                CREATE TABLE books (
+                    ISBN VARCHAR(20) PRIMARY KEY,
+                    Book_Title VARCHAR(1000),
+                    Book_Author VARCHAR(500),
+                    Year_Of_Publication VARCHAR(20),
+                    Publisher VARCHAR(500),
+                    Image_URL_S VARCHAR(500),
+                    Image_URL_M VARCHAR(500),
+                    Image_URL_L VARCHAR(500)
+                ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+            """)
+            
+            # Create ratings table without foreign key constraint initially
+            cursor.execute("""
+                CREATE TABLE ratings (
+                    User_ID INT,
+                    ISBN VARCHAR(20),
+                    Book_Rating INT,
+                    PRIMARY KEY (User_ID, ISBN)
+                ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+            """)
+            
+            print("Database and tables created successfully")
+            return connection
+            
+    except Error as e:
+        print(f"Error: {e}")
+        return None
+
+def clean_data(value):
+    if pd.isna(value):
+        return None
+    return str(value).strip()
+
+def batch_insert_data(connection, batch_size=1000):
+    try:
+        cursor = connection.cursor()
+        
+        # First, clean and prepare books data
+        print("Preparing books data...")
+        books_data = []
+        for _, row in books.iterrows():
+            try:
+                books_data.append((
+                    clean_data(row['ISBN']),
+                    clean_data(row['Book-Title']),
+                    clean_data(row['Book-Author']),
+                    clean_data(row['Year-Of-Publication']),
+                    clean_data(row['Publisher']),
+                    clean_data(row['Image-URL-S']),
+                    clean_data(row['Image-URL-M']),
+                    clean_data(row['Image-URL-L'])
+                ))
+            except Exception as e:
+                print(f"Error processing book row: {row['ISBN']}, Error: {e}")
+                continue
+
+        # Insert books data in batches
+        print(f"Inserting {len(books_data)} books...")
+        for i in range(0, len(books_data), batch_size):
+            batch = books_data[i:i + batch_size]
+            try:
+                cursor.executemany("""
+                    INSERT IGNORE INTO books 
+                    (ISBN, Book_Title, Book_Author, Year_Of_Publication,
+                     Publisher, Image_URL_S, Image_URL_M, Image_URL_L)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """, batch)
+                connection.commit()
+                print(f"Inserted books {i} to {i + len(batch)}")
+            except Error as e:
+                print(f"Error inserting books batch {i}: {e}")
+                connection.rollback()
+
+        # Get list of valid ISBNs from books table
+        cursor.execute("SELECT ISBN FROM books")
+        valid_isbns = {row[0] for row in cursor.fetchall()}
+
+        # Prepare ratings data (only for books that exist)
+        print("Preparing ratings data...")
+        ratings_data = []
+        for _, row in ratings.iterrows():
+            try:
+                isbn = clean_data(row['ISBN'])
+                if isbn in valid_isbns:  # Only include ratings for existing books
+                    ratings_data.append((
+                        int(row['User-ID']),
+                        isbn,
+                        int(row['Book-Rating'])
+                    ))
+            except Exception as e:
+                print(f"Error processing rating row: {row['ISBN']}, Error: {e}")
+                continue
+
+        # Insert ratings data in batches
+        print(f"Inserting {len(ratings_data)} ratings...")
+        for i in range(0, len(ratings_data), batch_size):
+            batch = ratings_data[i:i + batch_size]
+            try:
+                cursor.executemany("""
+                    INSERT IGNORE INTO ratings (User_ID, ISBN, Book_Rating)
+                    VALUES (%s, %s, %s)
+                """, batch)
+                connection.commit()
+                print(f"Inserted ratings {i} to {i + len(batch)}")
+            except Error as e:
+                print(f"Error inserting ratings batch {i}: {e}")
+                connection.rollback()
+
+        # Add foreign key constraint after data insertion
+        try:
+            cursor.execute("""
+                ALTER TABLE ratings
+                ADD CONSTRAINT fk_ratings_books
+                FOREIGN KEY (ISBN) REFERENCES books(ISBN)
+            """)
+            print("Foreign key constraint added successfully")
+        except Error as e:
+            print(f"Error adding foreign key constraint: {e}")
+
+        # Verify data insertion
+        cursor.execute("SELECT COUNT(*) FROM books")
+        books_count = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM ratings")
+        ratings_count = cursor.fetchone()[0]
+        print(f"\nInsertion Summary:")
+        print(f"Total books inserted: {books_count}")
+        print(f"Total ratings inserted: {ratings_count}")
+        
+    except Error as e:
+        print(f"Error inserting data: {e}")
+        connection.rollback()
+
+# Main execution
+try:
+    print("Starting database setup and data insertion...")
+    connection = setup_database()
+    if connection:
+        batch_insert_data(connection)
+        print("Data insertion completed successfully")
+except Exception as e:
+    print(f"An error occurred: {e}")
+finally:
+    if 'connection' in locals() and connection and connection.is_connected():
+        connection.close()
+        print("Database connection closed")
