@@ -46,6 +46,7 @@ A modern, full-stack library management system built with Flask and Bootstrap, f
 - **Database**: MySQL
 - **Authentication**: JWT (JSON Web Tokens)
 - **API**: RESTful architecture
+- **Recommendation System**: Collaborative filtering using scikit-learn
 
 ### Frontend
 
@@ -75,10 +76,28 @@ cd library-management-system
 
 ```bash
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# On Windows:
+venv\Scripts\activate.ps1  # For PowerShell
+# OR
+venv\Scripts\activate.bat  # For Command Prompt
+
+# On Unix/MacOS:
+source venv/bin/activate
 ```
 
 3. Install dependencies:
+
+### Important Note for Python 3.13 Users
+
+If you're using Python 3.13, you'll need to install compatible versions of SQLAlchemy and Flask-SQLAlchemy:
+
+```bash
+pip install -r requirements.txt
+pip install SQLAlchemy==1.4.50 Flask-SQLAlchemy==2.5.1
+```
+
+For Python 3.10-3.12 users:
 
 ```bash
 pip install -r requirements.txt
@@ -86,12 +105,26 @@ pip install -r requirements.txt
 
 4. Configure the database:
 
-```bash
-# Update database configuration in app.py
-SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://username:password@localhost/database_name'
+The default configuration uses MySQL with the following connection string:
+
+```python
+# In app.py
+SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://root:123456789@127.0.0.1:3306/book_recommendation?charset=utf8mb4&collation=utf8mb4_unicode_ci'
 ```
 
-5. Initialize the database:
+You should update this to match your MySQL installation:
+
+```python
+SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://username:password@localhost:3306/book_recommendation?charset=utf8mb4&collation=utf8mb4_unicode_ci'
+```
+
+5. Create the database:
+
+```sql
+CREATE DATABASE IF NOT EXISTS book_recommendation CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+6. Initialize the database:
 
 ```bash
 python
@@ -100,11 +133,44 @@ python
 >>>     db.create_all()
 ```
 
-6. Run the application:
+7. Run the application:
 
 ```bash
 python app.py
 ```
+
+The application will be available at http://127.0.0.1:5000
+
+## How to Run the Application
+
+After completing the installation and database setup steps:
+
+1. **Set up environment variables** (optional):
+   ```bash
+   set FLASK_APP=app.py
+   set FLASK_ENV=development  # for development mode
+   ```
+
+2. **Run the Flask development server**:
+   ```bash
+   flask run
+   ```
+   This will start the server at `http://localhost:5000`
+
+3. **Access the application**:
+   - Open your web browser and go to `http://localhost:5000`
+   - Admin login: Use the admin credentials you created
+   - Student login: Register as a new student or use existing credentials
+
+4. **Alternative production deployment**:
+   For production, you can use Gunicorn (included in requirements):
+   ```bash
+   gunicorn -w 4 -b :5000 app:app
+   ```
+
+5. **Testing the API**:
+   The API endpoints can be tested using tools like Postman or curl.
+   See the API Documentation section for available endpoints.
 
 ## Project Structure
 
@@ -113,6 +179,11 @@ library-management-system/
 ├── app.py                 # Main application file
 ├── models.py             # Database models
 ├── requirements.txt      # Project dependencies
+├── results/              # Recommendation model files
+│   ├── books.pkl        # Serialized books data
+│   ├── popular.pkl      # Popular books model
+│   ├── pt.pkl           # Pivot table for recommendations
+│   └── similarity_scores.pkl # Book similarity matrix
 ├── static/
 │   ├── css/             # Custom CSS styles
 │   ├── js/              # JavaScript files
