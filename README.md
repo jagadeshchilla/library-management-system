@@ -1,67 +1,54 @@
-# Library Management System
+# 📚 Library Management System
 
-A modern, full-stack library management system built with Flask and Bootstrap, featuring separate interfaces for administrators and students.
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![Flask](https://img.shields.io/badge/Flask-2.3.3-green)
+![MySQL](https://img.shields.io/badge/MySQL-8.0%2B-orange)
 
-## Features
+A modern library management system with separate admin/student interfaces, book recommendations, and analytics.
 
-### Admin Dashboard
+## Table of Contents
+- [Features](#-features)
+- [Demo](#-demo)
+- [Installation](#-installation)
+- [Tech Stack](#-tech-stack)
+- [API Docs](#-api-documentation)
+- [Deployment](#-deployment)
 
-- **Book Management**
-  - Add, edit, and delete books
-  - Track book inventory
-  - Manage book details (ISBN, title, author, publisher, etc.)
-  - Upload and manage book cover images
-- **Student Management**
-  - View and manage student accounts
-  - Track student borrowing history
-  - Monitor overdue books and fines
-- **Borrowing System**
-  - Process book borrowing and returns
-  - Automatic fine calculation for overdue books
-  - Track borrowing trends and statistics
-- **Analytics Dashboard**
-  - Real-time statistics and metrics
-  - Borrowing trends visualization
-  - Popular books tracking
-  - Recent activities log
+## 🚀 Features
 
-### Student Interface
+### Admin Portal
+| Feature | Description |
+|---------|-------------|
+| Book Management | CRUD operations for library inventory |
+| User Management | Manage student accounts and permissions |
+| Analytics Dashboard | Visualize borrowing trends and statistics |
+| Fine Calculation | Automatic overdue book penalties |
 
-- **Book Discovery**
-  - Browse available books
-  - Search by title, author, or ISBN
-  - View book details and availability
-  - Personalized book recommendations
-- **Account Management**
-  - Track currently borrowed books
-  - View borrowing history
-  - Check due dates and fines
-  - Receive notifications for due dates
+### Student Portal
+| Feature | Description |
+|---------|-------------|
+| Book Search | Find books by title/author/ISBN |
+| Borrow History | Track current/past borrows |
+| Recommendations | Personalized book suggestions |
+| Profile Management | Update personal details |
 
-## Technical Stack
+## 📸 Demo
 
-### Backend
+<!-- Add screenshot section -->
+![Admin Dashboard](/screenshots/dashboard.png) *Admin Interface*
 
-- **Framework**: Flask (Python)
-- **Database**: MySQL
-- **Authentication**: JWT (JSON Web Tokens)
-- **API**: RESTful architecture
-- **Recommendation System**: Collaborative filtering using scikit-learn
+![Student Portal](/screenshots/student-view.png) *Student Interface*
 
-### Frontend
+## 💻 Tech Stack
 
-- **Framework**: Bootstrap 5
-- **JavaScript**: Vanilla JS with modern ES6+ features
-- **CSS**: Custom styling with responsive design
-- **Icons**: Font Awesome
-
-### Features
-
-- **Security**: JWT-based authentication
-- **Responsive Design**: Mobile-first approach
-- **Real-time Updates**: Dynamic content loading
-- **Error Handling**: Comprehensive error management
-- **Data Validation**: Both client and server-side validation
+| Component | Technology |
+|-----------|------------|
+| Backend | Python/Flask |
+| Frontend | Bootstrap 5 |
+| Database | MySQL |
+| ORM | SQLAlchemy |
+| Auth | JWT |
+| Deployment | Gunicorn/Nginx |
 
 ## Installation
 
@@ -172,30 +159,7 @@ After completing the installation and database setup steps:
    The API endpoints can be tested using tools like Postman or curl.
    See the API Documentation section for available endpoints.
 
-## Project Structure
-
-```
-library-management-system/
-├── app.py                 # Main application file
-├── models.py             # Database models
-├── requirements.txt      # Project dependencies
-├── results/              # Recommendation model files
-│   ├── books.pkl        # Serialized books data
-│   ├── popular.pkl      # Popular books model
-│   ├── pt.pkl           # Pivot table for recommendations
-│   └── similarity_scores.pkl # Book similarity matrix
-├── static/
-│   ├── css/             # Custom CSS styles
-│   ├── js/              # JavaScript files
-│   └── images/          # Image assets
-└── templates/
-    ├── admin.html       # Admin dashboard template
-    ├── base.html        # Base template
-    ├── login.html       # Login page template
-    └── student.html     # Student dashboard template
-```
-
-## API Endpoints
+## API Documentation
 
 ### Authentication
 
@@ -220,30 +184,36 @@ library-management-system/
 - `POST /api/student/borrow-book` - Borrow a book
 - `POST /api/student/return-book/<borrow_id>` - Return a book
 
-## Recent Updates
+## Project Structure
 
-### UI Improvements
+```
+library-management-system/
+├── app.py                 # Main application file
+├── models.py             # Database models
+├── requirements.txt      # Project dependencies
+├── results/              # Recommendation model files
+│   ├── books.pkl        # Serialized books data
+│   ├── popular.pkl      # Popular books model
+│   ├── pt.pkl           # Pivot table for recommendations
+│   └── similarity_scores.pkl # Book similarity matrix
+├── static/
+│   ├── css/             # Custom CSS styles
+│   ├── js/              # JavaScript files
+│   └── images/          # Image assets
+└── templates/
+    ├── admin.html       # Admin dashboard template
+    ├── base.html        # Base template
+    ├── login.html       # Login page template
+    └── student.html     # Student dashboard template
+```
 
-- Enhanced sidebar navigation with responsive design
-- Improved book card layouts
-- Standardized image sizes for consistency
-- Added smooth animations and transitions
-- Implemented professional color scheme
+## Deployment
 
-### Functionality Enhancements
+For production deployment, you can use Gunicorn (included in requirements):
 
-- Added book recommendation system
-- Implemented real-time search functionality
-- Enhanced error handling and user notifications
-- Added pagination for large data sets
-- Improved modal interactions
-
-### Security Updates
-
-- Implemented JWT authentication
-- Added role-based access control
-- Enhanced input validation
-- Improved error handling and logging
+```bash
+gunicorn -w 4 -b :5000 app:app
+```
 
 ## Contributing
 
